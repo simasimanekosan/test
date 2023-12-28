@@ -1,58 +1,43 @@
+<!DOCTYPE html>
 <html>
   <body>
-    <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <title>Firebase Authentication sample 01</title>
+  <title>Firebase Authentication sample 02</title>
   <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
   <link href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" rel="stylesheet" type="text/css">
 </head>
-<body>
-  <h1>Firebase Authenction Sample 01</h1>
+  <h1>Firebase Authenction Sample 02</h1>
   <div id="auth"></div>
   <script src="/__/firebase/7.16.0/firebase-app.js"></script> 
   <script src="/__/firebase/7.16.0/firebase-auth.js"></script> 
   <script src="/__/firebase/init.js"></script> 
   <script type="text/javascript">
 
-    /*
-  Firebase Authentcation を使った認証サンプル 01
-  Firebase Authentication UI を使い、サインイン用のUIを生成
-  ポップアップウィンドウで認証画面を表示、サインイン後元の画面に移動
-  サインアウト ボタンと、Googleの表示名をウェルカムメッセージとして表示
+  /*
+  Firebase Authentcation を使った認証サンプル 02
+  Google認証用のオブジェクトを生成
+  認証用の関数「signIn」を定義
   サインアウト 用の関数「signOut」を定義
-
+  認証の状態をチェックして、「サインイン」「サインアウト 」のボタンを出し分ける
   */
 
-  const ui = new firebaseui.auth.AuthUI(firebase.auth());
-  const uiConfig = {
-  callbacks: {
-    signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-      return true;
-    },
-  },
-  signInFlow: 'popup',
-  signInSuccessUrl: 'auth-sample01.html',
-  signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-  ],
-  tosUrl: 'sample01.html',
-  privacyPolicyUrl: 'auth-sample01.html'
-  };
+  const provider = new firebase.auth.GoogleAuthProvider();
 
-  ui.start('#auth', uiConfig);
+  function signIn() {
+  firebase.auth().signInWithPopup(provider)
+  .then(result => {
+      console.log('ログインしました。');
 
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-        const signOutMessage = `
-        <p>Hello, ${user.displayName}!<\/p>
-        <button type="submit"  onClick="signOut()">サインアウト<\/button>
-        `;
-        document.getElementById('auth').innerHTML =  signOutMessage;
-        console.log('ログインしています');
-
-    } 
+  }).catch(error => {
+        const signinError = `
+        サインインエラー
+        エラーメッセージ： ${error.message}
+        エラーコード: ${error.code}
+        `
+  　　　console.log(signinError);
   });
+  }
 
   function signOut() {
   firebase.auth().onAuthStateChanged(user => {
@@ -69,9 +54,24 @@
   });
   }
 
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+        const signOutMessage = `
+        <p>Hello, ${user.displayName}!<\/p>
+        <button class="btn btn-primary" type="submit"  onClick="signOut()">サインアウト<\/button>
+        `;
+        document.getElementById('auth').innerHTML =  signOutMessage;
+        console.log('ログインしています');
+
+    } else {
+          const signInMessage = `
+          <button class="btn btn-primary" type="submit"  onClick="signIn()">サインイン<\/button>
+          `;
+          document.getElementById('auth').innerHTML = signInMessage;       
+    }
+  });
+
   </script>
-</body>
-</html>
     <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
