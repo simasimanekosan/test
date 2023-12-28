@@ -1,95 +1,49 @@
 <!DOCTYPE html>
-<html>
-  <body>
 <html lang="ja">
-<head>
-  <title>Firebase Authentication sample 02</title>
-  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
-  <link href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" rel="stylesheet" type="text/css">
-</head>
-  <h1>Firebase Authenction Sample 02</h1>
-  <div id="auth"></div>
-  <script src="/__/firebase/7.16.0/firebase-app.js"></script> 
-  <script src="/__/firebase/7.16.0/firebase-auth.js"></script> 
-  <script src="/__/firebase/init.js"></script> 
-  <script type="text/javascript">
-
-  /*
-  Firebase Authentcation を使った認証サンプル 02
-  Google認証用のオブジェクトを生成
-  認証用の関数「signIn」を定義
-  サインアウト 用の関数「signOut」を定義
-  認証の状態をチェックして、「サインイン」「サインアウト 」のボタンを出し分ける
-  */
-
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  function signIn() {
-  firebase.auth().signInWithPopup(provider)
-  .then(result => {
-      console.log('ログインしました。');
-
-  }).catch(error => {
-        const signinError = `
-        サインインエラー
-        エラーメッセージ： ${error.message}
-        エラーコード: ${error.code}
-        `
-  　　　console.log(signinError);
-  });
-  }
-
-  function signOut() {
-  firebase.auth().onAuthStateChanged(user => {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log('ログアウトしました');
-        location.reload();
-      })
-      .catch((error) => {
-        console.log(`ログアウト時にエラーが発生しました (${error})`);
-      });
-  });
-  }
-
-  firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-        const signOutMessage = `
-        <p>Hello, ${user.displayName}!<\/p>
-        <button class="btn btn-primary" type="submit"  onClick="signOut()">サインアウト<\/button>
-        `;
-        document.getElementById('auth').innerHTML =  signOutMessage;
-        console.log('ログインしています');
-
-    } else {
-          const signInMessage = `
-          <button class="btn btn-primary" type="submit"  onClick="signIn()">サインイン<\/button>
-          `;
-          document.getElementById('auth').innerHTML = signInMessage;       
-    }
-  });
-
-  </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyDv4FazkuFGoA8wy_maBttWPa9Thg3_71Y",
-    authDomain: "bfrf-be-sima.firebaseapp.com",
-    projectId: "bfrf-be-sima",
-    storageBucket: "bfrf-be-sima.appspot.com",
-    messagingSenderId: "206132645512",
-    appId: "1:206132645512:web:6fda8669f71a007bff193d"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
-  </body>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.0.2/firebase-auth.js"></script>
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyDv4FazkuFGoA8wy_maBttWPa9Thg3_71Y",
+            authDomain: "bfrf-be-sima.firebaseapp.com",
+            databaseURL: "https://bfrf-be-sima-default-rtdb.firebaseio.com/",
+            projectId: "bfrf-be-sima",
+            storageBucket: "bfrf-be-sima.appspot.com",
+            messagingSenderId: "206132645512",
+            appId: "1:206132645512:web:6fda8669f71a007bff193d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        </script>
+        <script src="https://www.gstatic.com/firebasejs/ui/3.5.2/firebase-ui-auth__ja.js"></script>
+        <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+    </head>
+    <body>
+        <div id="firebaseui-auth-container">
+        </div>
+        <script>
+            firebase.auth().onAuthStateChanged(function(user) {
+            if (user) { // ログイン時
+                console.log(user);  // firebaseから受け取ったユーザー情報。本番運用時はconsole.logは消すこと
+                var loginText = "ようこそ" + user.displayName + 'さん ' + user.email + "<button onclick='logOut()'>ログアウト</button>";
+                document.getElementById('firebaseui-auth-container').innerHTML = loginText;
+            } else {  // 未ログイン時
+                var ui = new firebaseui.auth.AuthUI(firebase.auth());
+                ui.start('#firebaseui-auth-container', {
+                    signInSuccessUrl: '/',
+                    signInOptions: [
+                        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    ],
+                });
+            }
+            });
+            function logOut() {
+                firebase.auth().signOut().then(function() {
+                    location.reload();
+                });
+            }
+        </script>
+    </body>
 </html>
